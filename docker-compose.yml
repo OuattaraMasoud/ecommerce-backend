@@ -1,0 +1,32 @@
+version: '4.25.2'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nestjs-api
+    restart: always
+    ports:
+      - 3001:3000
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+
+  postgres:
+    image: postgres:13
+    container_name: postgresprisma
+    restart: always
+    ports:
+      - 5435:5432
+    environment:
+      - .env
+    env_file:
+      - .env
+    volumes:
+      - .data:/var/lib/postgresql/data
+
+volumes:
+  postgres:
+    name: nest-prisma-docker-db
