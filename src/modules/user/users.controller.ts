@@ -10,14 +10,13 @@ import { User } from '@prisma/client';
 export class UsersController {
     constructor(private readonly usersService: UsersService) { }
 
-    @Get()
+    @Get("me")
     @ApiOperation({ summary: 'Get current user' })
     @ApiResponse({ status: 200, description: 'The user' })
     @ApiResponse({ status: 404, description: 'User not found.' })
-    async me(@Req() req: any, @Query('keyboard') keyboard: string): Promise<User[]> {
-        console.log("Request =>", req.user);
-
-        return await this.usersService.getCurrentUser(req.user.id);
+    async me(@Query('email') email: string): Promise<User> {
+        console.log("Request =>", email);
+        return await this.usersService.getCurrentUser(email);
     }
 
 
