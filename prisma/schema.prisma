@@ -29,6 +29,7 @@ model Product {
     updatedAt     DateTime     @updatedAt
     subCategory   SubCategory? @relation(fields: [subCategoryId], references: [id])
     purchases     Purchase[]
+    images        Image[]
 }
 
 model Category {
@@ -59,4 +60,13 @@ model Purchase {
     updatedAt  DateTime @updatedAt
     user       User     @relation(fields: [userId], references: [id])
     product    Product  @relation(fields: [productId], references: [id])
+}
+
+model Image {
+    id        String   @id @default(cuid())
+    url       String
+    productId String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    product   Product  @relation(fields: [productId], references: [id])
 }
