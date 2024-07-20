@@ -30,6 +30,7 @@ model Product {
     subCategory   SubCategory? @relation(fields: [subCategoryId], references: [id])
     purchases     Purchase[]
     images        Image[]
+    imagesUrl     String[]     @default([])
 }
 
 model Category {
