@@ -8,6 +8,8 @@ import { JwtStrategy } from './modules/auth/jwt.strategy';
 import { UsersModule } from './modules/user/user.module';
 import { ProductsModule } from './modules/product/product.module';
 import { CategoriesModule } from './modules/category/category.module';
+import { SubCategoriesModule } from './modules/subcategory/subcategory.module';
+import { PurchasesModule } from './modules/purchase/purchase.module';
 
 
 @Module({
@@ -19,6 +21,8 @@ import { CategoriesModule } from './modules/category/category.module';
     AuthModule,
     UsersModule,
     ProductsModule,
+    SubCategoriesModule,
+    PurchasesModule,
     CategoriesModule
   ],
   controllers: [AppController],
