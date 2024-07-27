@@ -19,48 +19,47 @@ model User {
     purchases Purchase[]
 }
 
-model Product {
-    id            String       @id @default(cuid())
-    name          String
-    description   String
-    price         Float
-    subCategoryId String?
-    createdAt     DateTime     @default(now())
-    updatedAt     DateTime     @updatedAt
-    subCategory   SubCategory? @relation(fields: [subCategoryId], references: [id])
-    purchases     Purchase[]
-    images        Image[]
-    imagesUrl     String[]     @default([])
-}
-
 model Category {
-    id            String        @id @default(cuid())
-    name          String
-    createdAt     DateTime      @default(now())
-    updatedAt     DateTime      @updatedAt
-    subCategories SubCategory[]
+    id        String    @id @default(cuid())
+    name      String
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    products  Product[]
 }
 
 model SubCategory {
-    id         String    @id @default(cuid())
-    name       String
-    categoryId String
-    createdAt  DateTime  @default(now())
-    updatedAt  DateTime  @updatedAt
-    category   Category  @relation(fields: [categoryId], references: [id])
-    products   Product[]
+    id        String    @id @default(cuid())
+    name      String
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    products  Product[]
+}
+
+model Product {
+    id            String       @id @default(cuid())
+    name          String
+    brand         String
+    description   String
+    price         Float
+    subCategoryId String?
+    categoryId    String?
+    createdAt     DateTime     @default(now())
+    updatedAt     DateTime     @updatedAt
+    subCategory   SubCategory? @relation(fields: [subCategoryId], references: [id])
+    images        Image[]
+    category      Category?    @relation(fields: [categoryId], references: [id])
+    imagesUrl     String[]     @default([])
+    purchases     Purchase[]   @relation("ProductPurchases")
 }
 
 model Purchase {
-    id         String   @id @default(cuid())
+    id         String    @id @default(cuid())
     userId     String
-    productId  String
-    quantity   Int
     totalPrice Float
-    createdAt  DateTime @default(now())
-    updatedAt  DateTime @updatedAt
-    user       User     @relation(fields: [userId], references: [id])
-    product    Product  @relation(fields: [productId], references: [id])
+    createdAt  DateTime  @default(now())
+    updatedAt  DateTime  @updatedAt
+    user       User      @relation(fields: [userId], references: [id])
+    products   Product[] @relation("ProductPurchases")
 }
 
 model Image {

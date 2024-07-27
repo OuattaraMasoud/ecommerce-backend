@@ -11,7 +11,7 @@ import { UpdatePurchaseDto } from './dto/update-purchase.dto';
 export class PurchaseController {
     constructor(private readonly purchaseService: PurchaseService) { }
 
-    @Post()
+    @Post("create-purchase")
     @ApiOperation({ summary: 'Create a new purchase' })
     @ApiResponse({ status: 200, description: 'Purchase created successfully' })
     async createPurchase(@Body() createPurchaseDto: CreatePurchaseDto): Promise<string> {

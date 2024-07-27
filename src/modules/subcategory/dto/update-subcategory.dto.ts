@@ -6,7 +6,4 @@ export class UpdateSubCategoryDto {
     @IsString()
     name?: string;
 
-    @IsOptional()
-    @IsString()
-    categoryId?: string;
 }

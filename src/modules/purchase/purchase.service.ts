@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { CreatePurchaseDto } from './dto/create-purchase.dto';
 import { UpdatePurchaseDto } from './dto/update-purchase.dto';
 import axios from 'axios';
+import { Product } from '@prisma/client';
 
 @Injectable()
 export class PurchaseService {
@@ -16,10 +17,35 @@ export class PurchaseService {
         this.sparqlEndpoint = this.configService.get<string>('SPARQL_ENDPOINT');
     }
 
+
     async createPurchase(createPurchaseDto: CreatePurchaseDto): Promise<string> {
         try {
-            const createdPurchase = await this.prisma.purchase.create({ data: createPurchaseDto });
+            const { userId, totalPrice, productIds } = createPurchaseDto;
+
+            // Calcul du prix total des produits (vous devez implémenter cette fonction selon votre logique métier)
+
+
+            // Création de l'achat avec transaction
+            const createdPurchase = await this.prisma.purchase.create({
+                data: {
+                    userId: userId, // Assurez-vous que userId est correctement typé selon votre modèle Prisma
+                    totalPrice: totalPrice,
+                    products: {
+                        connect: productIds.map((productId: string) => ({ id: productId })),
+                    },
+
+                },
+                include: {
+                    products: true,
+                    user: true // Inclure les détails des produits associés à l'achat créé
+                },
+
+            });
+
+            // Appel à une fonction pour insérer l'achat dans un store RDF, par exemple
             await this.insertPurchaseToRdf(createdPurchase);
+
+            // Retourner un message de succès si nécessaire
             return 'Purchase created successfully';
         } catch (error) {
             throw error;
@@ -36,7 +62,6 @@ export class PurchaseService {
             INSERT DATA {
                 ex:purchase_${purchase.id} a ex:Purchase ;
                     ex:userId "${purchase.userId}" ;
-                    ex:quantity ${purchase.quantity} ;
                     ex:totalPrice ${purchase.totalPrice} ;
                     ex:createdAt "${purchase.createdAt.toISOString()}" ;
                     ex:updatedAt "${purchase.updatedAt.toISOString()}" .

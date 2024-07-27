@@ -10,6 +10,10 @@ export class UpdateProductDto {
     description?: string;
 
     @IsOptional()
+    @IsString()
+    brand?: string;
+
+    @IsOptional()
     @IsNumber()
     price?: number;
 

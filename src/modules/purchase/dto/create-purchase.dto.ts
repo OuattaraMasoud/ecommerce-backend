@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsString, IsArray, IsNumber } from 'class-validator';
 
 export class CreatePurchaseDto {
     @IsNotEmpty()
@@ -6,12 +6,8 @@ export class CreatePurchaseDto {
     userId: string;
 
     @IsNotEmpty()
-    @IsString()
-    productId: string;
-
-    @IsNotEmpty()
-    @IsNumber()
-    quantity: number;
+    @IsArray()
+    productIds: string[]; // Utiliser un tableau de IDs pour représenter plusieurs produits
 
     @IsNotEmpty()
     @IsNumber()

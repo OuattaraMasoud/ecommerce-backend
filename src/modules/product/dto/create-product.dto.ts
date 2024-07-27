@@ -8,6 +8,9 @@ export class CreateProductDto {
     @IsNotEmpty()
     @IsString()
     description: string;
+    @IsNotEmpty()
+    @IsString()
+    brand: string;
 
     @IsNotEmpty()
     @IsNumber()
