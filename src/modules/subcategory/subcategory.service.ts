@@ -21,9 +21,10 @@ export class SubCategoriesService {
 
     ///=============insert subCategory in posgre db and rdf===========================
     async createSubCategory(subCategory: CreateSubCategoryDto): Promise<string> {
-        console.log("sous categorie", subCategory);
+
         try {
             const createdSubCategory = await this.prisma.subCategory.create({ data: subCategory });
+            console.log("sous categorie", createdSubCategory);
             await this.insertSubCategoryToRdf(createdSubCategory);
             return "subCategory created successfully";
         } catch (error) {
@@ -37,7 +38,6 @@ export class SubCategoriesService {
             INSERT DATA {
                 ex:subCategory_${subCategory.id} a ex:SubCategory ;
                 ex:subCategoryName "${subCategory.name}" ;
-                ex:belongsToCategory ex:category_${subCategory.categoryId} ;
                 ex:subCategoryCreatedAt "${subCategory.createdAt.toISOString()}" ;
                 ex:subCategoryUpdatedAt "${subCategory.updatedAt.toISOString()}" .
             }
@@ -74,7 +74,6 @@ export class SubCategoriesService {
             INSERT DATA {
                 ex:subCategory_${subCategory.id} a ex:SubCategory ;
                 ex:subCategoryName "${subCategory.name}" ;
-                ex:categoryId "${subCategory.categoryID}" ;
                 ex:subCategoryCreatedAt "${subCategory.createdAt.toISOString()}" ;
                 ex:subCategoryUpdatedAt "${subCategory.updatedAt.toISOString()}" .
             }
@@ -205,12 +204,12 @@ export class SubCategoriesService {
     async findAllSubCategory(): Promise<any> {
         try {
             // Récupérer tous les sous categories depuis Prisma
-            const prismaProducts = await this.prisma.subCategory.findMany();
+            const prismaSubCategories = await this.prisma.subCategory.findMany();
 
             // Récupérer tous les sous categories RDF
-            const rdfProducts = await this.findAllSubCategoryFromRdf();
+            const rdfSubCategories = await this.findAllSubCategoryFromRdf();
 
-            return { prismaProducts, rdfProducts };
+            return { prismaSubCategories, rdfSubCategories };
         } catch (error) {
             console.error('Failed to find all products:', error);
             throw error;
@@ -219,15 +218,19 @@ export class SubCategoriesService {
     private async findAllSubCategoryFromRdf(): Promise<any> {
         // Créer la requête SPARQL pour récupérer tous les sous categories
         const sparqlQuery = `
-             PREFIX ex: <http://example.com#>
-        SELECT ?subCategoryId ?subCategoryName ?subCategoryCreatedAt ?subCategoryUpdatedAt
-        WHERE {
-            ?product a ex:SubCategory ;
-                ex:subCategoryName ?subCategoryName ;
-                ex:subCategoryCreatedAt ?subCategoryCreatedAt ;
-                ex:subCategoryUpdatedAt ?subCategoryUpdatedAt .
-            BIND(STR(?subCategory) AS ?subCategoryId)  # Capture the subCategory URI as productId
-        }
+                PREFIX ex: <http://example.com#>
+SELECT (STRAFTER(STR(?subCategory), "#") AS ?subCategoryId)
+       ?subCategoryName
+       ?subCategoryCreatedAt
+       ?subCategoryUpdatedAt
+      
+WHERE {
+  # Récupérer les sous catégories
+  ?subCategory a ex:SubCategory ;
+            ex:subCategoryName ?subCategoryName ;
+            ex:subCategoryCreatedAt ?subCategoryCreatedAt ;
+            ex:subCategoryUpdatedAt ?subCategoryUpdatedAt .
+}
         `;
 
         try {

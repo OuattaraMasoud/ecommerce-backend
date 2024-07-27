@@ -37,11 +37,60 @@ export class ProductsController {
     @ApiOperation({ summary: 'Find products by criteria' })
     @ApiResponse({ status: 200, description: 'Returns products matching the criteria' })
     async findProductsByCriteria(
-        @Query('name') name: string,
-        @Query('description') description: string,
+        @Query('categoryId') categoryId: string,
+        @Query('subCategoryId') subCategoryId: string,
     ): Promise<any> {
         try {
-            return await this.productsService.findProductsByCriteria(name, description);
+            return await this.productsService.findProductsByCriteria(categoryId, subCategoryId);
+        } catch (error) {
+            throw error;
+        }
+    }
+    @Get('user-find-products-by-criteria')
+    @ApiOperation({ summary: 'Find products by criteria' })
+    @ApiResponse({ status: 200, description: 'Returns products matching the criteria' })
+    async userFindProductsByCriteria(
+        @Query('input') input: string,
+
+    ): Promise<any> {
+        try {
+            return await this.productsService.userFindProductsByCriteria(input);
+        } catch (error) {
+            throw error;
+        }
+    }
+    @Get('find-products-by-category')
+    @ApiOperation({ summary: 'Find products by category' })
+    @ApiResponse({ status: 200, description: 'Returns products matching the category' })
+    async findProductsByCategory(
+
+        @Query('categoryId') categoryId: string,
+    ): Promise<any> {
+        try {
+            return await this.productsService.findProductsByCategory(categoryId);
+        } catch (error) {
+            throw error;
+        }
+    }
+    @Get('find-recommanded-products')
+    @ApiOperation({ summary: 'Find products by category' })
+    @ApiResponse({ status: 200, description: 'Returns products matching the category' })
+    async recommendProductsForUser(
+
+        @Query('userId') userId: string,
+    ): Promise<any> {
+        try {
+            return await this.productsService.recommendProductsForUser(userId);
+        } catch (error) {
+            throw error;
+        }
+    }
+    @Get('find-recent-products')
+    @ApiOperation({ summary: 'Find recent products' })
+    @ApiResponse({ status: 200, description: 'Returns recent added products ' })
+    async findRecentProducts(): Promise<any> {
+        try {
+            return await this.productsService.findRecentProducts();
         } catch (error) {
             throw error;
         }

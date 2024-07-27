@@ -184,18 +184,7 @@ export class CategoriesService {
 
     async findAllCategories(): Promise<any> {
         try {
-            const prismaCategories = await this.prisma.category.findMany({
-                include: {
-                    subCategories: {
-                        select: {
-                            id: true,
-                            name: true,
-                            createdAt: true,
-                            updatedAt: true,
-                        },
-                    },
-                },
-            });
+            const prismaCategories = await this.prisma.category.findMany({});
 
             const rdfCategories = await this.findAllCategoriesFromRdf();
 
@@ -209,30 +198,17 @@ export class CategoriesService {
     private async findAllCategoriesFromRdf(): Promise<any> {
         const sparqlQuery = `
           PREFIX ex: <http://example.com#>
-
 SELECT (STRAFTER(STR(?category), "#") AS ?categoryId)
        ?categoryName
        ?categoryCreatedAt
        ?categoryUpdatedAt
-       (STRAFTER(STR(?subCategory), "#") AS ?subCategoryId)
-       ?subCategoryName
-       ?subCategoryCreatedAt
-       ?subCategoryUpdatedAt
+      
 WHERE {
   # Récupérer les catégories
   ?category a ex:Category ;
             ex:categoryName ?categoryName ;
             ex:categoryCreatedAt ?categoryCreatedAt ;
             ex:categoryUpdatedAt ?categoryUpdatedAt .
-
-  # Récupérer les sous-catégories associées à chaque catégorie, si elles existent
-  OPTIONAL {
-    ?subCategory a ex:SubCategory ;
-                ex:belongsToCategory ?category ;
-                ex:subCategoryName ?subCategoryName ;
-                ex:subCategoryCreatedAt ?subCategoryCreatedAt ;
-                ex:subCategoryUpdatedAt ?subCategoryUpdatedAt .
-  }
 }
 
         `;
@@ -241,28 +217,17 @@ WHERE {
             const response = await axios.post(`${this.sparqlEndpoint}/categories/query`, sparqlQuery, {
                 headers: { 'Content-Type': 'application/sparql-query' }
             });
-
+            console.log('==============>Fetch all Category from RDF store:', response.data.results.bindings);
             const results = response.data.results.bindings.map((binding: any) => {
                 const categoryIdFull = binding.categoryId.value;
                 const categoryId = categoryIdFull.replace('http://example.com#category_', '');
-
-                // Vérifier si des sous-catégories sont présentes
-                let subCategories = [];
-                if (binding.subCategoryId && binding.subCategoryName) {
-                    subCategories.push({
-                        subCategoryId: binding.subCategoryId.value.replace('http://example.com#subcategory_', ''),
-                        subCategoryName: binding.subCategoryName.value,
-                        subCategoryCreatedAt: new Date(binding.subCategoryCreatedAt.value),
-                        subCategoryUpdatedAt: new Date(binding.subCategoryUpdatedAt.value),
-                    });
-                }
 
                 return {
                     categoryId,
                     categoryName: binding.categoryName.value,
                     categoryCreatedAt: new Date(binding.categoryCreatedAt.value),
                     categoryUpdatedAt: new Date(binding.categoryUpdatedAt.value),
-                    subCategories: subCategories // Ajouter les sous-catégories au résultat
+
                 };
             });
 
